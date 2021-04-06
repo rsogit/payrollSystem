@@ -15,20 +15,21 @@ def show_menu():
     print("2 - Listar Funcionários")
     print("3 - Sair\n")
 
+
 if __name__ == '__main__':
     print_hi('Welcome to the payroll System program')
     running = True
     while running:
         show_menu()
-        options = int(input())
+        options = int(input("Selecione a opcão que deseja acessar: "))
 
         if options == 1:
-            print("First Option")
+            print("First Option\n")
         elif options == 2:
-            print("Second Option")
+            print("Second Option\n")
         elif options == 3:
             running = False
-            print("Exiting")
+            print("Exiting\n")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 

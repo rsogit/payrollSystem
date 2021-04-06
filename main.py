@@ -3,10 +3,8 @@
 # Press Shift+F10 to execute it or replace it with your code.
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
+from Employee import Employee
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
 def show_menu():
     print("=======Sistema de Folha de Pagamento========\n")
@@ -16,15 +14,27 @@ def show_menu():
     print("3 - Sair\n")
 
 
+def add_employee():
+    employee = Employee()
+    employees.append(employee)
+
+
+def show_employees():
+    for employee in employees:
+        print(employee.name)
+
+
 if __name__ == '__main__':
-    print_hi('Welcome to the payroll System program')
+    print('Welcome to the payroll System program')
     running = True
+    employees = []
     while running:
         show_menu()
         options = int(input("Selecione a opcão que deseja acessar: "))
 
         if options == 1:
             print("First Option\n")
+            add_employee()
         elif options == 2:
             print("Second Option\n")
         elif options == 3:

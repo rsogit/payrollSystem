@@ -9,6 +9,11 @@ class Salaried(Employee):
         self._type = "Assalariado"
         self._salary = float(input("Informe o salário do funcionário: R$ "))
 
+    def __init__(self, name, address, id_number, salary):
+        super().__init__(name, address, id_number)
+        self._type = "Assalariado"
+        self._salary = float(salary)
+
     @property
     def salary(self):
         return self._salary

@@ -11,6 +11,12 @@ class Commissioned(Employee):
         self._salary = float(input("Informe o salário do funcionário: R$ "))
         self._percentage = float(input("Informe a porcentagem de comissão do funcionário (apenas números): "))
 
+    def __init__(self, name, address, id_number, salary, percentage):
+        super().__init__(name, address, id_number)
+        self._type = "Comissionado"
+        self._salary = float(salary)
+        self._percentage = float(percentage)
+
     @property
     def salary(self):
         return self._salary

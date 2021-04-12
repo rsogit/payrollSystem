@@ -9,6 +9,11 @@ class Hourly(Employee):
         self._type = "Horista"
         self._hourly_salary = float(input("Informe a hora de trabalho do funcionário: R$ "))
 
+    def __init__(self, name, address, id_number, hourly_salary):
+        super().__init__(name, address, id_number)
+        self._type = "Horista"
+        self._hourly_salary = float(hourly_salary)
+
     @property
     def hourly_salary(self):
         return self._hourly_salary

@@ -5,7 +5,6 @@
 
 import json
 import datetime
-import time
 
 from Models.TimeCard import TimeCard
 from Models.Sale import Sale
@@ -21,11 +20,13 @@ def show_menu():
     print("MENU PRINCIPAL\n")
     print("1 - Cadastrar Funcionário")
     print("2 - Listar Funcionários")
-    print("3 - Remover Funcionário")
-    print("4 - Adicionar cartão de ponto para um funcionário")
-    print("5 - Adicionar Resultado de Venda para um funcionário")
+    print("3 - Editar Funcionário")
+    print("4 - Remover Funcionário")
+    print("5 - Adicionar cartão de ponto para um funcionário")
+    print("6 - Adicionar Resultado de Venda para um funcionário")
+    print("7 - Adicionar Taxa de Servico Sindical para um funcionário")
 
-    print("6 - Sair\n")
+    print("8 - Sair\n")
 
 
 def add_timecard(employee):
@@ -99,11 +100,91 @@ def add_employee():
     print("Novo funcionário adicionado com sucesso!\n")
 
 
-def delete_employee(size):
+def edit_employee(size, employee_number):
+    if employee_number <= size:
+        employee = employees[employee_number-1]
+        print(f'Digite a opcão que deseja editar do funcionário: {employee.name}')
+        print("1 - Nome")
+        print("2 - Tipo")
+        print("3 - Endereco")
+        print("4 - Método de pagamento")
+        print("5 - Participacão no sindicato")
+        if employee.union_info.is_active:
+            print("6 - ID no sindicato")
+            print("7 - Taxa sindical fixa")
+        try:
+            answer = int(input())
+        except:
+            print("Digite um número válido.")
+
+        if answer == 1:
+            new_name = input(f'Digite o novo nome do funcionário "{employee.name}":\n')
+            employee.name = new_name
+            print("Nome alterado com sucesso")
+        elif answer == 2:
+            new_type = int(input(f'Selecione o novo tipo do funcionário "{employee.name}":\n'
+                             f'1 - Horista\n'
+                             f'2 - Comissionado\n'
+                             f'3 - Assalariado\n'))
+            if new_type == 1:
+                employee = Hourly(employee.name,
+                                  employee.address,
+                                  employee.id_number)
+                print(f'O funcionário {employee.name} agora é do tipo {employee.type}\n')
+            elif new_type == 2:
+                employee = Commissioned(employee.name,
+                                        employee.address,
+                                        employee.id_number)
+                print(f'O funcionário {employee.name} agora é do tipo {employee.type}\n')
+            elif new_type == 3:
+                employee = Salaried(employee.name,
+                                    employee.address,
+                                    employee.id_number)
+                print(f'O funcionário {employee.name} agora é do tipo {employee.type}\n')
+            else:
+                print("o funcionário não foi editado, tente novamente.")
+                return
+        elif answer == 3:
+            new_address = input(f'Digite o novo endereco do funcionário: {employee.name}')
+            employee.address = new_address
+            print("Endereco alterado com sucesso")
+        elif answer == 4:
+            print("implement edit paymentMethod")
+        elif answer == 5:
+            if employee.union_info.is_active:
+                opt = int(input(f'Atualmente o funcionário {employee.name} está ativo no sindicato, '
+                            f'deseja deixá-lo inativo?\n'
+                      f'1 - Sim\n'
+                      f'2 - Não\n'))
+            else:
+                opt = int(input(f'Atualmente o funcionário {employee.name} está inativo no sindicato, '
+                            f'deseja deixá-lo ativo?\n'
+                      f'1 - Sim\n'
+                      f''f'2 - Não\n'))
+            if opt == 1:
+                employee.union_info.is_active = True
+            elif opt == 2:
+                employee.union_info.is_active = False
+                if not (employee.union_info.monthly_tax > 0):
+                    new_taxes = float(input("Adicione a taxa mensal fixa do sindicato para esse funcionário: R$ "))
+                    employee.union_info.monthly_tax = new_taxes
+            else:
+                print("Entrada inválida, tente novamente.")
+        elif answer == 6:
+            print("implement edit syndical ID feature")
+        elif answer == 7:
+            new_taxes = float(input("Adicione a nova taxa mensal fixa do sindicato para esse funcionário: R$ "))
+            employee.union_info.monthly_tax = new_taxes
+        elif answer == 8:
+            print("Voltando para o menu principal...")
+        elif answer > 8:
+            print("Por favor, selecione um número válido")
+        else:
+            print("Retornando ao menu principal...")
+
+
+def delete_employee(size, employee_number):
     if size != 0:
-        print("Digite o número do funcionário que deseja deletar: ")
-        show_all_employees(employees)
-        employee_number = int(input("\n"))
         for index, employee in enumerate(employees):
             if employee.id_number == employee_number:
                 deleted_employee = employees.pop(index)
@@ -120,6 +201,15 @@ def show_employees(employees_array, employee_type):
     for employee in employees_array:
         print(f'{employee.id_number} - {employee.name}')
 
+
+def show_union_employees(employees_array):
+    for employee in employees_array:
+        print(f'{employee.id_number} - {employee.name}')
+
+
+def get_union_employees(employees_array):
+    employees_array = [x for x in employees_array if x.union_info.is_active]
+    return employees_array
 
 def show_employee_details(employee):
     print("______________________________________")
@@ -149,22 +239,42 @@ if __name__ == '__main__':
         elif options == 2:
             if len(employees) != 0:
                 show_all_employees(employees)
+                print("Selecione")
             else:
                 print("Não há funcionários cadastrados")
         elif options == 3:
-            delete_employee(len(employees))
+            print("Digite o ID do funcionário que deseja editar: ")
+            show_all_employees(employees)
+            employee_number = int(input("\n"))
+            edit_employee(len(employees), employee_number)
         elif options == 4:
-            print("Selecione o funcionário que deseja adicionar o Cartão de Ponto:\n")
+            print("Digite o ID do funcionário que deseja deletar: ")
+            show_all_employees(employees)
+            employee_number = int(input("\n"))
+            delete_employee(len(employees), employee_number)
+        elif options == 5:
+            print("Digite o ID do funcionário que deseja adicionar o Cartão de Ponto:\n")
             show_employees(employees, "Horista")
             option = int(input(""))
             selected_employee = get_employee_by_id(employees, option).pop()
             add_timecard(selected_employee)
-        elif options == 5:
-            print("Selecione o funcionário que deseja adicionar o Resultado de Venda:\n")
+        elif options == 6:
+            print("Digite o ID do funcionário que deseja adicionar o Resultado de Venda:\n")
             show_employees(employees, "Comissionado")
             option = int(input(""))
             selected_employee = get_employee_by_id(employees, option).pop()
             add_sale(selected_employee)
-        elif options == 6:
+        elif options == 7:
+            print("Digite o ID do funcionário que deseja adicionar a Taxa de Servico Sindical:\n")
+            union_employees = get_union_employees(employees)
+            if len(union_employees) > 0:
+                show_union_employees(union_employees)
+                option = int(input(""))
+                selected_employee = get_employee_by_id(employees, option).pop()
+                selected_employee.union_info.add_service_fee()
+            else:
+                print("Não há funcionários ativos no sindicato")
+
+        elif options == 8:
             running = False
             print("Exiting\n")

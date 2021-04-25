@@ -4,15 +4,13 @@ from Models.Employee import Employee
 class Salaried(Employee):
     _salary: float
 
-    def __init__(self, name, address, id_number):
+    def __init__(self, name, address, id_number, salary=None):
         super().__init__(name, address, id_number)
         self._type = "Assalariado"
-        self._salary = float(input("Informe o salário do funcionário: R$ "))
-
-    def __init__(self, name, address, id_number, salary):
-        super().__init__(name, address, id_number)
-        self._type = "Assalariado"
-        self._salary = float(salary)
+        if salary:
+            self._salary = float(salary)
+        else:
+            self._salary = float(input("Informe o salário do funcionário: R$ "))
 
     @property
     def salary(self):

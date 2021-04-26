@@ -1,5 +1,7 @@
 from Models.Employee import Employee
 from Models.Sale import Sale
+from datetime import date
+import pandas as pd
 
 
 class Commissioned(Employee):
@@ -7,19 +9,18 @@ class Commissioned(Employee):
     _percentage: float
     _sales: [Sale]
 
-    def __init__(self, name, address, id_number):
-        super().__init__(name, address, id_number)
+    def __init__(self, name, address, id_number, salary=None, percentage=None, schedule_type="weekly 2 friday"):
+        super().__init__(name, address, id_number, schedule_type)
         self._type = "Comissionado"
         self._sales = []
-        self._salary = float(input("Informe o salário do funcionário: R$ "))
-        self._percentage = float(input("Informe a porcentagem de comissão do funcionário (apenas números): "))
-
-    def __init__(self, name, address, id_number, salary, percentage):
-        super().__init__(name, address, id_number)
-        self._type = "Comissionado"
-        self._sales = []
-        self._salary = float(salary)
-        self._percentage = float(percentage)
+        if salary:
+            self._salary = salary
+        else:
+            self._salary = float(input("Informe o salário do funcionário: R$ "))
+        if percentage:
+            self._percentage = percentage
+        else:
+            self._percentage = float(input("Informe a porcentagem de comissão do funcionário (apenas números): "))
 
     def add_sale(self, sale):
         self._sales.append(sale)

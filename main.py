@@ -1,11 +1,6 @@
-# This is a sample Python script.
-
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
 import json
 import datetime
-
+from datetime import datetime
 from Models.TimeCard import TimeCard
 from Models.Sale import Sale
 from Models.Hourly import Hourly
@@ -13,6 +8,7 @@ from Models.Salaried import Salaried
 from Models.Commissioned import Commissioned
 
 id_counting: int = 1
+payment_schedules = ["weekly 1 friday", "weekly 2 friday", "monthly $"]
 
 
 def show_menu():
@@ -211,6 +207,7 @@ def get_union_employees(employees_array):
     employees_array = [x for x in employees_array if x.union_info.is_active]
     return employees_array
 
+
 def show_employee_details(employee):
     print("______________________________________")
     print(f'Nome: {employee.name}')
@@ -229,7 +226,6 @@ if __name__ == '__main__':
     employees = []
 
     open_seed_file()
-
     while running:
         show_menu()
         options = int(input("Selecione a opcão que deseja acessar: "))
@@ -274,7 +270,9 @@ if __name__ == '__main__':
                 selected_employee.union_info.add_service_fee()
             else:
                 print("Não há funcionários ativos no sindicato")
-
         elif options == 8:
+            print("Rodando folha de pagamento para hoje")
+
+        elif options == 9:
             running = False
             print("Exiting\n")

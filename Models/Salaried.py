@@ -4,8 +4,8 @@ from Models.Employee import Employee
 class Salaried(Employee):
     _salary: float
 
-    def __init__(self, name, address, id_number, salary=None):
-        super().__init__(name, address, id_number)
+    def __init__(self, name, address, id_number, salary=None, schedule_type="monthly $"):
+        super().__init__(name, address, id_number, schedule_type)
         self._type = "Assalariado"
         if salary:
             self._salary = float(salary)

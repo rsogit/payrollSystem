@@ -11,4 +11,4 @@ class TimeCard:
 
     @work_hours.setter
     def work_hours(self, work_hours):
-        self._work_hours = work_hours\
+        self._work_hours = work_hours

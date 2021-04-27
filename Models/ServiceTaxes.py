@@ -7,5 +7,13 @@ class ServiceTaxes:
             self._value = value
             self._date = date
         else:
-            self._value = input("Digite o valor da nova taxa de servico: R$")
+            self._value = float(input("Digite o valor da nova taxa de servico: R$"))
             self._date = input("Digite a data da nova taxa de servico no formato (DD/MM/AAAA): ")
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value

@@ -26,18 +26,22 @@ def show_menu():
 
 
 def add_timecard(employee):
+    FMT = "%H:%M"
+    time_in = input("Digite o horário de entrada no formato HH:MM. \nEx.: '08:00'\n")
+    date_time_in = datetime.strptime(time_in, FMT)
+    time_out = input("Digite o horário de saída no formato HH:MM. \nEx.: '12:00'\n")
+    date_time_out = datetime.strptime(time_out, FMT)
 
-    time_in = input("Digite o horário de entrada no formato HH:MM. \nEx.: '08:00'\n").split(":")
-    date_time_in = datetime.time(int(time_in[0]), int(time_in[1]))
-    time_out = input("Digite o horário de saída no formato HH:MM. \nEx.: '12:00'\n").split(":")
-    date_time_out = datetime.time(int(time_out[0]), int(time_out[1]))
+    print(f'Time in: {date_time_in.time()}')
+    print(f'Time out: {date_time_out.time()}')
 
     if date_time_out >= date_time_in:
-        work_hours = int(time_out[0]) - int(time_in[0])
-        timecard = TimeCard(date_time_in, date_time_out, work_hours)
+        work_hours = date_time_out - date_time_in
+        print(work_hours)
+        timecard = TimeCard(date_time_in.time(), date_time_out.time(), work_hours)
         employee.add_timecard(timecard)
     else:
-        print("O horário informado é inválido")
+        print("O horário informado é inválido. Por favor, preencha o horário de entrada e saída na ordem correta.")
 
 
 def add_sale(employee):
@@ -224,12 +228,23 @@ if __name__ == '__main__':
     print('Welcome to the payroll System program')
     running = True
     employees = []
+    emp1 = Hourly("Raul Oliveira", "Paju", 1, 12, "weekly 1 friday")
+    employees.append(emp1)
+    #open_seed_file()
 
-    open_seed_file()
     while running:
-        show_menu()
+        print(f'Name: {emp1.name}\n'
+              f'Address: {emp1.address}\n'
+              #f'Schedule Type: {emp1.schedule_type}\n'
+              #f'Schedule: {emp1.schedule}\n'
+              f'Union activated?: {emp1.union_info.is_active}\n'
+              f'Union tax: {emp1.union_info.monthly_tax}\n'
+              f'Last pay date: {emp1._last_pay_date}\n'
+              f'Hourly salary: R$ {emp1.hourly_salary}\n')
+        # show_menu()
         options = int(input("Selecione a opcão que deseja acessar: "))
-
+        if options == 10:
+            emp1.pay_salary()
         if options == 1:
             add_employee()
         elif options == 2:

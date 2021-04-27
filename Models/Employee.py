@@ -103,7 +103,6 @@ class Employee:
     def schedule_type(self, schedule):
         self._schedule = schedule
 
-
     @property
     def type(self):
         return self._type

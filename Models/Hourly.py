@@ -1,5 +1,6 @@
 from Models.Employee import Employee
 from Models.TimeCard import TimeCard
+from datetime import datetime
 
 
 class Hourly(Employee):
@@ -40,9 +41,20 @@ class Hourly(Employee):
             print(f'Salário Líquido = R$ {liquid_salary}')
         return liquid_salary
 
+    def add_timecard(self):
+        FMT = "%H:%M"
+        time_in = input("Digite o horário de entrada no formato HH:MM. \nEx.: '08:00'\n")
+        date_time_in = datetime.strptime(time_in, FMT)
+        time_out = input("Digite o horário de saída no formato HH:MM. \nEx.: '12:00'\n")
+        date_time_out = datetime.strptime(time_out, FMT)
 
-    def add_timecard(self, timecard):
-        self._time_cards.append(timecard)
+        if date_time_out >= date_time_in:
+            work_hours = date_time_out - date_time_in
+            timecard = TimeCard(date_time_in.time(), date_time_out.time(), work_hours)
+            self._time_cards.append(timecard)
+        else:
+            print("O horário informado é inválido. Por favor, preencha o horário de entrada e saída na ordem correta.")
+
 
     def print_timecards(self):
         for (index, time_card) in enumerate(self._time_cards):

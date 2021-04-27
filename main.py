@@ -25,33 +25,6 @@ def show_menu():
     print("8 - Sair\n")
 
 
-def add_timecard(employee):
-    FMT = "%H:%M"
-    time_in = input("Digite o horário de entrada no formato HH:MM. \nEx.: '08:00'\n")
-    date_time_in = datetime.strptime(time_in, FMT)
-    time_out = input("Digite o horário de saída no formato HH:MM. \nEx.: '12:00'\n")
-    date_time_out = datetime.strptime(time_out, FMT)
-
-    print(f'Time in: {date_time_in.time()}')
-    print(f'Time out: {date_time_out.time()}')
-
-    if date_time_out >= date_time_in:
-        work_hours = date_time_out - date_time_in
-        print(work_hours)
-        timecard = TimeCard(date_time_in.time(), date_time_out.time(), work_hours)
-        employee.add_timecard(timecard)
-    else:
-        print("O horário informado é inválido. Por favor, preencha o horário de entrada e saída na ordem correta.")
-
-
-def add_sale(employee):
-    date = input("Insira a data da venda no formato DD/MM/AAAA. \nEx.: 08/04/2021\n")
-    value = input("Digite o valor da venda: \nR$ ")
-    sale_result = Sale(date, value)
-    employee.add_sale(sale_result)
-    employee.print_sales()
-
-
 def open_seed_file():
 
     global id_counting
@@ -268,13 +241,13 @@ if __name__ == '__main__':
             show_employees(employees, "Horista")
             option = int(input(""))
             selected_employee = get_employee_by_id(employees, option).pop()
-            add_timecard(selected_employee)
+            selected_employee.add_timecard()
         elif options == 6:
             print("Digite o ID do funcionário que deseja adicionar o Resultado de Venda:\n")
             show_employees(employees, "Comissionado")
             option = int(input(""))
             selected_employee = get_employee_by_id(employees, option).pop()
-            add_sale(selected_employee)
+            selected_employee.add_sale()
         elif options == 7:
             print("Digite o ID do funcionário que deseja adicionar a Taxa de Servico Sindical:\n")
             union_employees = get_union_employees(employees)

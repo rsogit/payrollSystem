@@ -22,8 +22,12 @@ class Commissioned(Employee):
         else:
             self._percentage = float(input("Informe a porcentagem de comissão do funcionário (apenas números): "))
 
-    def add_sale(self, sale):
-        self._sales.append(sale)
+    def add_sale(self):
+        date = input("Insira a data da venda no formato DD/MM/AAAA. \nEx.: 08/04/2021\n")
+        value = input("Digite o valor da venda: \nR$ ")
+        sale_result = Sale(date, value)
+        self._sales.append(sale_result)
+        self.print_sales()
 
     def print_sales(self):
         for (index, sale) in enumerate(self._sales):

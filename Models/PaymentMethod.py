@@ -1,17 +1,17 @@
 class PaymentMethod:
 
-    def __init__(self, value, id, type):
-        self._value = value
+    def __init__(self, name, id=None, type=None):
+        self._name = name
         self._id = id
         self._type = type
 
     @property
-    def value(self):
-        return self._value
+    def name(self):
+        return self._name
 
-    @value.setter
-    def value(self, value):
-        self._value = value
+    @name.setter
+    def name(self, name):
+        self._name = name
 
     @property
     def id(self):

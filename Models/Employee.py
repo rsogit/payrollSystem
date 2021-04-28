@@ -4,11 +4,7 @@ import pandas as pd
 from datetime import datetime
 from datetime import date
 
-
-def get_last_business_day():
-    d = datetime.now()
-    offset = BMonthEnd()
-    return offset.rollforward(d)
+from Models.PaymentMethod import PaymentMethod
 
 
 def get_week_day(week_day):
@@ -36,14 +32,16 @@ class Employee:
     _last_pay_date: date
     _schedule_type: str
     _schedule: [date] = []
+    _payment_method: PaymentMethod
 
-    def __init__(self, name, address, id_number, schedule_type):
+    def __init__(self, name, address, id_number, schedule_type, payment_method):
         self._name = name
         self._address = address
         self._id_number = id_number
         self._schedule_type = schedule_type
         self._last_pay_date = datetime.now().date()
         self._union_info = UnionMember()
+        self._payment_method = payment_method
         self._schedule = self.set_schedule(schedule_type)
 
     def set_schedule(self, schedule_type: str):
@@ -66,11 +64,12 @@ class Employee:
                 if 0 < day_frequency <= 31:
                     range = pd.date_range(hour, periods=12, freq='MS') \
                             + pd.DateOffset(days=(day_frequency-1))
-                    return range
+                    return range.tolist()
                 else:
                     print("Selecione um dia do mês válido")
             elif day_frequency == "$":
-                self._schedule.append(get_last_business_day())
+                range = pd.date_range(hour, periods=12, freq='BM')
+                return range.tolist()
             else:
                 print("A expressão de agenda de pagamento customizado está inválida, "
                       "tente novamente no formato 'weekly 2 friday', por exemplo")
@@ -80,12 +79,20 @@ class Employee:
             if weekday_frequency:
                 if isinstance(day_frequency, int):
                     range = pd.date_range(hour, periods=12, freq=f'{day_frequency}W-{get_week_day(weekday_frequency)}')
-                    return range
+                    return range.tolist()
             else:
                 print("A expressão de agenda de pagamento customizado está inválida, "
                       "tente novamente no formato 'weekly 2 friday', por exemplo")
         else:
             return []
+
+    def calculate_discounts(self):
+        total_service_fee = 0
+        if self.union_info.is_active:
+            if len(self.union_info.service_taxes) > 0:
+                for service_fee in self.union_info.service_taxes:
+                    total_service_fee = total_service_fee + service_fee.value
+        return total_service_fee + self.union_info.monthly_tax
 
     @property
     def schedule_type(self):
@@ -134,3 +141,11 @@ class Employee:
     @property
     def union_info(self):
         return self._union_info
+
+    @property
+    def payment_method(self):
+        return self._payment_method
+
+    @payment_method.setter
+    def payment_method(self, payment_method):
+        self._payment_method = payment_method

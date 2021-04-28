@@ -3,6 +3,10 @@ import datetime
 from datetime import datetime
 from Models.TimeCard import TimeCard
 from Models.Sale import Sale
+from Models.PaymentMethod import PaymentMethod
+from Models.Deposit import Deposit
+from Models.InHandsCheck import InHandsCheck
+from Models.MailCheck import MailCheck
 from Models.Hourly import Hourly
 from Models.Salaried import Salaried
 from Models.Commissioned import Commissioned
@@ -21,8 +25,10 @@ def show_menu():
     print("5 - Adicionar cartão de ponto para um funcionário")
     print("6 - Adicionar Resultado de Venda para um funcionário")
     print("7 - Adicionar Taxa de Servico Sindical para um funcionário")
+    print("8 - Rodar folha de pagamento")
+    print("9 - Criar agenda de pagamento")
 
-    print("8 - Sair\n")
+    print("0 - Sair\n")
 
 
 def open_seed_file():
@@ -48,6 +54,31 @@ def open_seed_file():
         print(f'Total de funcionários: {len(employees)}')
 
 
+def set_payment_method(user_address: str) -> PaymentMethod:
+    payment_choice = int(input("Qual o método de pagamento preferido para o funcionário?\n"
+                               "1 - Depósito Bancário\n"
+                               "2 - Cheque em mãos\n"
+                               "3 - Cheque pelos Correios\n"))
+    if payment_choice == 1:
+        payment_method = Deposit()
+    elif payment_choice == 2:
+        payment_method = InHandsCheck()
+    elif payment_choice == 3:
+        opt = input(f'Deseja que o endereco de entrega dos Correios seja "{user_address}"?\n'
+                    f'1 - Sim\n'
+                    f'2 - Não\n')
+        if int(opt) == 1:
+            payment_method = MailCheck(user_address)
+        elif int(opt) == 2:
+            delivery_address = input("Digite o endereco de entrega que deseja: ")
+            payment_method = MailCheck(delivery_address)
+        else:
+            print("O número informado é inválido. Tente novamente.")
+    else:
+        print("Número inválido, tente novamente")
+    return payment_method
+
+
 def add_employee():
 
     global id_counting
@@ -56,14 +87,16 @@ def add_employee():
     address = input("Insira o endereço do funcionário: ")
 
     print("Selecione o número correspondente ao tipo de funcionário: ")
-    employee_type = int(input("1. Horista\n2. Assalariado\n3. Comissionado\n"))
-
+    employee_type = int(input("1. Horista\n"
+                              "2. Assalariado\n"
+                              "3. Comissionado\n"))
+    payment_method = set_payment_method(address)
     if employee_type == 1:
-        employee = Hourly(name, address, id_counting)
+        employee = Hourly(name, address, id_counting, payment_method)
     elif employee_type == 2:
-        employee = Salaried(name, address, id_counting)
+        employee = Salaried(name, address, id_counting, payment_method)
     elif employee_type == 3:
-        employee = Commissioned(name, address, id_counting)
+        employee = Commissioned(name, address, id_counting, payment_method)
     else:
         print("Falha no cadastro do novo funcionário, por favor tente novamente respondendo o tipo de 1 a 3.")
         return
@@ -197,27 +230,51 @@ def get_employee_by_id(employees, employee_id):
     return [x for x in employees if x.id_number == employee_id]
 
 
+def run_payroll(employees):
+    if isinstance(employees[2], Commissioned):
+        for emp in employees:
+            emp.calculate_salary()
+
+
+def get_payroll(employees_array, pay_date):
+    scheduled_employees = []
+    for employee in employees_array:
+        if employee.schedule[0].date() == pay_date.date():
+            scheduled_employees.append(employee)
+
+    if len(scheduled_employees) > 0:
+        print(f'Os seguintes funcionários estão agendados para a folha de pagamento referente à {pay_date.date()}')
+        for emp in scheduled_employees:
+            print(f'{emp.id_number} - {emp.name}')
+        print("Deseja confirmar o pagamento para esses funcionários?\n"
+              "1 - Sim\n"
+              "2 - Não\n")
+        opt = int(input())
+
+        if opt == 1:
+            run_payroll(scheduled_employees)
+        elif opt == 2:
+            print("Certo, volte aqui quando quiser realizar o pagamento.")
+    else:
+        print("Nenhum funcionário está agendado para a folha de pagamento de hoje.")
+
+
 if __name__ == '__main__':
     print('Welcome to the payroll System program')
     running = True
     employees = []
-    emp1 = Hourly("Raul Oliveira", "Paju", 1, 12, "weekly 1 friday")
+    emp1 = Hourly("Raul Oliveira", "Paju", 1, payment_method=Deposit(agency=1245, account=456), hourly_salary=12)
+    emp2 = Salaried("Gabi Sayuri", "Poco", 2, Deposit(agency=1245, account=456), salary=2000)
+    emp3 = Commissioned("Matheus Enrique", "Antares", 3, InHandsCheck(), salary=2000, percentage=12)
     employees.append(emp1)
+    employees.append(emp2)
+    employees.append(emp3)
     #open_seed_file()
 
     while running:
-        print(f'Name: {emp1.name}\n'
-              f'Address: {emp1.address}\n'
-              #f'Schedule Type: {emp1.schedule_type}\n'
-              #f'Schedule: {emp1.schedule}\n'
-              f'Union activated?: {emp1.union_info.is_active}\n'
-              f'Union tax: {emp1.union_info.monthly_tax}\n'
-              f'Last pay date: {emp1._last_pay_date}\n'
-              f'Hourly salary: R$ {emp1.hourly_salary}\n')
-        # show_menu()
+        show_menu()
+
         options = int(input("Selecione a opcão que deseja acessar: "))
-        if options == 10:
-            emp1.pay_salary()
         if options == 1:
             add_employee()
         elif options == 2:
@@ -259,8 +316,24 @@ if __name__ == '__main__':
             else:
                 print("Não há funcionários ativos no sindicato")
         elif options == 8:
-            print("Rodando folha de pagamento para hoje")
-
+            print("Deseja rodar a folha de pagamento para hoje ou outro dia?\n"
+                  "1 - Rodar para hoje\n"
+                  "2 - Rodar para outra data")
+            opt = int(input())
+            if opt == 1:
+                run_payroll(employees, datetime.now())
+            elif opt == 2:
+                fmt = "%d/%m/%Y"
+                try:
+                    run_date = input("Digite a data que deseja rodar a folha de pagamento, "
+                                                       "no formato DD/MM/AAAA: ")
+                    run_date = datetime.strptime(run_date, fmt)
+                except:
+                    print("Data inválida, rodando folha de pagamento para hoje: ")
+                    run_date = datetime.now()
+                get_payroll(employees, run_date)
         elif options == 9:
+            print("Criar agenda de pagamento")
+        elif options == 0:
             running = False
             print("Exiting\n")

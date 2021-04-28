@@ -1,17 +1,15 @@
 import json
-import datetime
 from datetime import datetime
-from Models.TimeCard import TimeCard
-from Models.Sale import Sale
-from Models.PaymentMethod import PaymentMethod
-from Models.Deposit import Deposit
-from Models.InHandsCheck import InHandsCheck
-from Models.MailCheck import MailCheck
-from Models.Hourly import Hourly
-from Models.Salaried import Salaried
-from Models.Commissioned import Commissioned
+from Models.PaymentMethod.PaymentMethod import PaymentMethod
+from Models.PaymentMethod.Deposit import Deposit
+from Models.PaymentMethod.InHandsCheck import InHandsCheck
+from Models.PaymentMethod.MailCheck import MailCheck
+from Models.Employee.Hourly import Hourly
+from Models.Employee.Salaried import Salaried
+from Models.Employee.Commissioned import Commissioned
 
 id_counting: int = 1
+union_id: int = 1
 payment_schedules = ["weekly 1 friday", "weekly 2 friday", "monthly $"]
 
 
@@ -22,11 +20,12 @@ def show_menu():
     print("2 - Listar Funcionários")
     print("3 - Editar Funcionário")
     print("4 - Remover Funcionário")
-    print("5 - Adicionar cartão de ponto para um funcionário")
+    print("5 - Adicionar Cartão de Ponto para um funcionário")
     print("6 - Adicionar Resultado de Venda para um funcionário")
     print("7 - Adicionar Taxa de Servico Sindical para um funcionário")
     print("8 - Rodar folha de pagamento")
     print("9 - Criar agenda de pagamento")
+    print("10 - Editar agenda de pagamento de um funcionário")
 
     print("0 - Sair\n")
 
@@ -107,6 +106,7 @@ def add_employee():
 
 
 def edit_employee(size, employee_number):
+    global union_id
     if employee_number <= size:
         employee = employees[employee_number-1]
         print(f'Digite a opcão que deseja editar do funcionário: {employee.name}')
@@ -129,9 +129,9 @@ def edit_employee(size, employee_number):
             print("Nome alterado com sucesso")
         elif answer == 2:
             new_type = int(input(f'Selecione o novo tipo do funcionário "{employee.name}":\n'
-                             f'1 - Horista\n'
-                             f'2 - Comissionado\n'
-                             f'3 - Assalariado\n'))
+                                 f'1 - Horista\n'
+                                 f'2 - Comissionado\n'
+                                 f'3 - Assalariado\n'))
             if new_type == 1:
                 employee = Hourly(employee.name,
                                   employee.address,
@@ -155,7 +155,21 @@ def edit_employee(size, employee_number):
             employee.address = new_address
             print("Endereco alterado com sucesso")
         elif answer == 4:
-            print("implement edit paymentMethod")
+            try:
+                opt = int(input(f'Selecione o novo método de pagamento do funcionário "{employee.name}":\n'
+                                 f'1 - Depósito\n'
+                                 f'2 - Cheque em mãos\n'
+                                 f'3 - Cheque pelos Correios\n'))
+                if opt == 1:
+                    employee.payment_method = Deposit()
+                elif opt == 2:
+                    employee.payment_method = InHandsCheck()
+                elif opt == 3:
+                    employee.payment_method = MailCheck()
+                else:
+                    print("Por favor, selecione uma opção válida")
+            except:
+                print("Por favor, selecione uma opção válida")
         elif answer == 5:
             if employee.union_info.is_active:
                 opt = int(input(f'Atualmente o funcionário {employee.name} está ativo no sindicato, '
@@ -167,6 +181,8 @@ def edit_employee(size, employee_number):
                             f'deseja deixá-lo ativo?\n'
                       f'1 - Sim\n'
                       f''f'2 - Não\n'))
+                employee.union_info.union_id = union_id
+                union_id = union_id + 1
             if opt == 1:
                 employee.union_info.is_active = True
             elif opt == 2:
@@ -177,10 +193,20 @@ def edit_employee(size, employee_number):
             else:
                 print("Entrada inválida, tente novamente.")
         elif answer == 6:
-            print("implement edit syndical ID feature")
+            try:
+                opt = int(input(f"Digite um número inteiro maior que {union_id} para ser seu novo ID do Sindicato: "))
+                if opt > union_id:
+                    employee.union_info.union_id = opt
+                else:
+                    print(f"O novo ID precisa ser maior que {union_id}. Tente novamente.")
+            except:
+                print("Entrada inválida. Tente novamente.")
         elif answer == 7:
-            new_taxes = float(input("Adicione a nova taxa mensal fixa do sindicato para esse funcionário: R$ "))
-            employee.union_info.monthly_tax = new_taxes
+            try:
+                new_taxes = float(input("Adicione a nova taxa mensal fixa do sindicato para esse funcionário: R$ "))
+                employee.union_info.monthly_tax = new_taxes
+            except:
+                print("Entrada inválida. Tente novamente.")
         elif answer == 8:
             print("Voltando para o menu principal...")
         elif answer > 8:
@@ -231,9 +257,8 @@ def get_employee_by_id(employees, employee_id):
 
 
 def run_payroll(employees):
-    if isinstance(employees[2], Commissioned):
-        for emp in employees:
-            emp.calculate_salary()
+    for emp in employees:
+        emp.calculate_salary()
 
 
 def get_payroll(employees_array, pay_date):
@@ -257,6 +282,12 @@ def get_payroll(employees_array, pay_date):
             print("Certo, volte aqui quando quiser realizar o pagamento.")
     else:
         print("Nenhum funcionário está agendado para a folha de pagamento de hoje.")
+
+
+def show_schedule_types():
+    print("Essas são as agendas de pagamento atuais: \n")
+    for index, schedule in enumerate(payment_schedules):
+        print(f'{index+1} - {schedule}')
 
 
 if __name__ == '__main__':
@@ -333,7 +364,19 @@ if __name__ == '__main__':
                     run_date = datetime.now()
                 get_payroll(employees, run_date)
         elif options == 9:
-            print("Criar agenda de pagamento")
+            new_schedule = input("Por favor digite a nova agenda de pagamentos que deseja adicionar, "
+                                 "como no exemplo 'weekly 3 monday' ou 'mensal 2':\n")
+            payment_schedules.append(new_schedule)
+            show_schedule_types()
+        elif options == 10:
+            print("Digite o ID do funcionário que deseja alterar a agenda de pagamento:\n")
+            show_all_employees(employees)
+            option = int(input(""))
+            selected_employee = get_employee_by_id(employees, option).pop()
+            print("Escolha a nova agenda de pagamento do funcionário: ")
+            show_schedule_types()
+            opt = int(input()) - 1
+            selected_employee.set_schedule(payment_schedules[opt])
         elif options == 0:
             running = False
             print("Exiting\n")

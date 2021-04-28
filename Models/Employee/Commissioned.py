@@ -1,5 +1,5 @@
-from Models.Employee import Employee
-from Models.Sale import Sale
+from Models.Employee.Employee import Employee
+from Models.Sale.Sale import Sale
 from datetime import datetime
 
 

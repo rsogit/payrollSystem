@@ -1,10 +1,9 @@
-from Models.UnionMember import UnionMember
-from pandas.tseries.offsets import BMonthEnd
+from Models.Union.UnionMember import UnionMember
 import pandas as pd
 from datetime import datetime
 from datetime import date
 
-from Models.PaymentMethod import PaymentMethod
+from Models.PaymentMethod.PaymentMethod import PaymentMethod
 
 
 def get_week_day(week_day):

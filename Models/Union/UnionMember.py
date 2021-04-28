@@ -1,9 +1,10 @@
-from Models.ServiceTaxes import ServiceTaxes
+from Models.Union.ServiceTaxes import ServiceTaxes
 
 
 class UnionMember:
     _service_taxes: [ServiceTaxes]
     _monthly_tax: float
+    _union_id: int
 
     def __init__(self, monthly_tax=None):
         if monthly_tax:
@@ -36,6 +37,14 @@ class UnionMember:
     @service_taxes.setter
     def service_taxes(self, service_taxes):
         self._service_taxes = service_taxes
+
+    @property
+    def union_id(self):
+        return self._union_id
+
+    @union_id.setter
+    def union_id(self, union_id):
+        self._union_id = union_id
 
     def add_service_fee(self):
         if self._is_active:

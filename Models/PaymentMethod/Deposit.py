@@ -1,4 +1,4 @@
-from Models.PaymentMethod import PaymentMethod
+from Models.PaymentMethod.PaymentMethod import PaymentMethod
 
 
 class Deposit(PaymentMethod):

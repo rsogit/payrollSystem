@@ -1,4 +1,4 @@
-from Models.Employee import Employee
+from Models.Employee.Employee import Employee
 from Models.TimeCard import TimeCard
 from datetime import datetime
 

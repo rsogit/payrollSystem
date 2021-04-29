@@ -1,4 +1,3 @@
-import json
 from datetime import datetime
 from Models.PaymentMethod.PaymentMethod import PaymentMethod
 from Models.PaymentMethod.Deposit import Deposit
@@ -30,29 +29,6 @@ def show_menu():
     print("0 - Sair\n")
 
 
-def open_seed_file():
-
-    global id_counting
-
-    with open('Utils/data.json') as json_file:
-        data = json.load(json_file)['employees']
-
-    for employee in data:
-        if employee['type'] == "Horista":
-            employee = Hourly(employee['name'], employee['address'], id_counting, employee['salary'])
-        elif employee['type'] == "Assalariado":
-            employee = Salaried(employee['name'], employee['address'], id_counting, employee['salary'])
-        elif employee['type'] == "Comissionado":
-            employee = Commissioned(employee['name'], employee['address'], id_counting, employee['salary'],
-                                    employee['percentage'])
-        else:
-            print("Falha no cadastro do novo funcionário, por favor tente novamente respondendo o tipo de 1 a 3.")
-            return
-        id_counting = id_counting + 1
-        employees.append(employee)
-        print(f'Total de funcionários: {len(employees)}')
-
-
 def set_payment_method(user_address: str) -> PaymentMethod:
     payment_choice = int(input("Qual o método de pagamento preferido para o funcionário?\n"
                                "1 - Depósito Bancário\n"
@@ -77,6 +53,10 @@ def set_payment_method(user_address: str) -> PaymentMethod:
         print("Número inválido, tente novamente")
     return payment_method
 
+## Employees related functions
+
+# Add employee:
+# Creates a new employee and add it to the system with the given parameters
 
 def add_employee():
 
@@ -104,6 +84,22 @@ def add_employee():
     print(f'Total de funcionários: {len(employees)}')
     print("Novo funcionário adicionado com sucesso!\n")
 
+
+# Edit employee:
+# Selects a employee to edit and change its properties in the system.
+# The available options for edition are:
+# - Name: string with the new name for the employee
+# - Type: choose between the three employee types (Hourly, Salaried, Commissioned)
+# -------- Hourly: hourly_salary: float
+# - Address: string with the new address for the employee
+# - Payment Method: choose between the three payment methods.
+# ------ Deposit: account: int, agency: int
+# ------ MailCheck: address: str
+# ------ InHandsCheck
+# - Union ID: new id for the employee. The id must be higher than the highest union ID available
+# - Union participation: All "employee.union_info" are False by default. In this option you can toggle this attribute.
+# - Union tax: float with the value of the monthly tax charged by the union
+#
 
 def edit_employee(size, employee_number):
     global union_id
@@ -135,23 +131,26 @@ def edit_employee(size, employee_number):
             if new_type == 1:
                 employee = Hourly(employee.name,
                                   employee.address,
-                                  employee.id_number)
+                                  employee.id_number,
+                                  payment_method=employee.payment_method)
                 print(f'O funcionário {employee.name} agora é do tipo {employee.type}\n')
             elif new_type == 2:
                 employee = Commissioned(employee.name,
                                         employee.address,
-                                        employee.id_number)
+                                        employee.id_number,
+                                        payment_method=employee.payment_method)
                 print(f'O funcionário {employee.name} agora é do tipo {employee.type}\n')
             elif new_type == 3:
                 employee = Salaried(employee.name,
                                     employee.address,
-                                    employee.id_number)
+                                    employee.id_number,
+                                    payment_method=employee.payment_method)
                 print(f'O funcionário {employee.name} agora é do tipo {employee.type}\n')
             else:
                 print("o funcionário não foi editado, tente novamente.")
                 return
         elif answer == 3:
-            new_address = input(f'Digite o novo endereco do funcionário: {employee.name}')
+            new_address = input(f'Digite o novo endereco do funcionário: {employee.name}\n')
             employee.address = new_address
             print("Endereco alterado com sucesso")
         elif answer == 4:
@@ -214,6 +213,9 @@ def edit_employee(size, employee_number):
         else:
             print("Retornando ao menu principal...")
 
+# Delete Employee:
+# Deletes the given employee from the system
+
 
 def delete_employee(size, employee_number):
     if size != 0:
@@ -221,6 +223,9 @@ def delete_employee(size, employee_number):
             if employee.id_number == employee_number:
                 deleted_employee = employees.pop(index)
                 print(f'Funcionário "{deleted_employee.name}" deletado com sucesso!')
+
+# Show employees functions:
+# functions used to show and list employees according to its types
 
 
 def show_all_employees(employees):
@@ -236,12 +241,7 @@ def show_employees(employees_array, employee_type):
 
 def show_union_employees(employees_array):
     for employee in employees_array:
-        print(f'{employee.id_number} - {employee.name}')
-
-
-def get_union_employees(employees_array):
-    employees_array = [x for x in employees_array if x.union_info.is_active]
-    return employees_array
+        print(f'{employee.union_info.union_id} - {employee.name}')
 
 
 def show_employee_details(employee):
@@ -252,13 +252,37 @@ def show_employee_details(employee):
     print("______________________________________")
 
 
+def show_schedule_types():
+    print("Essas são as agendas de pagamento atuais: \n")
+    for index, schedule in enumerate(payment_schedules):
+        print(f'{index+1} - {schedule}')
+
+# Get employees:
+# functions used to get employees according to its types and properties
+
+
+def get_union_employees(employees_array):
+    employees_array = [x for x in employees_array if x.union_info.is_active]
+    return employees_array
+
+
 def get_employee_by_id(employees, employee_id):
     return [x for x in employees if x.id_number == employee_id]
+
+
+# Pay employees:
+# Functions related to the payroll. Used to pay each employee with the appropriate methods and values.
 
 
 def run_payroll(employees):
     for emp in employees:
         emp.calculate_salary()
+
+# get_payroll:
+# Lista os usuários que devem receber pagamento para o dia indicado. O usuário do sistema tem a opcao de rodar a folha
+# de pagamento para o dia atual ou escolher uma data para rodar.
+# Se o usuário escolher pagar os usuários informados pela funcão, a saída sera os contracheques de todos os
+# empregados pagos para aquele dia.
 
 
 def get_payroll(employees_array, pay_date):
@@ -275,7 +299,6 @@ def get_payroll(employees_array, pay_date):
               "1 - Sim\n"
               "2 - Não\n")
         opt = int(input())
-
         if opt == 1:
             run_payroll(scheduled_employees)
         elif opt == 2:
@@ -284,23 +307,27 @@ def get_payroll(employees_array, pay_date):
         print("Nenhum funcionário está agendado para a folha de pagamento de hoje.")
 
 
-def show_schedule_types():
-    print("Essas são as agendas de pagamento atuais: \n")
-    for index, schedule in enumerate(payment_schedules):
-        print(f'{index+1} - {schedule}')
+def initialize_employees():
+    global id_counting
 
-
-if __name__ == '__main__':
-    print('Welcome to the payroll System program')
-    running = True
-    employees = []
-    emp1 = Hourly("Raul Oliveira", "Paju", 1, payment_method=Deposit(agency=1245, account=456), hourly_salary=12)
-    emp2 = Salaried("Gabi Sayuri", "Poco", 2, Deposit(agency=1245, account=456), salary=2000)
-    emp3 = Commissioned("Matheus Enrique", "Antares", 3, InHandsCheck(), salary=2000, percentage=12)
+    emp1 = Hourly("Funcionário 1", "Primeiro endereco", 1, payment_method=Deposit(agency=1245, account=456), hourly_salary=12)
+    emp2 = Salaried("Funcionário 2", "Segundo endereco", 2, payment_method=MailCheck(), salary=2000)
+    emp3 = Commissioned("Funcionário 3", "Terceiro endereco", 3, payment_method=InHandsCheck(), salary=2000, percentage=12)
     employees.append(emp1)
     employees.append(emp2)
     employees.append(emp3)
-    #open_seed_file()
+
+    id_counting = len(employees) + 1
+
+
+if __name__ == '__main__':
+
+    print('Welcome to the payroll System program')
+    running = True
+    employees = []
+
+    # Uncomment the line above to use pre-made employees or add it yourself using the system
+    initialize_employees()
 
     while running:
         show_menu()

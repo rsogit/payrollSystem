@@ -4,7 +4,7 @@ from Models.PaymentMethod.PaymentMethod import PaymentMethod
 class MailCheck(PaymentMethod):
     _address: str
 
-    def __init__(self, address: str, name="Cheque via Correios", id=None, type=None):
+    def __init__(self, address: str="Endereco genérico", name="Cheque via Correios", id=None, type=None):
         super().__init__(name, id, type)
         self._address = address
 

@@ -1,5 +1,5 @@
 from Models.Employee.Employee import Employee
-from Models.TimeCard import TimeCard
+from Models.TimeCard.TimeCard import TimeCard
 from datetime import datetime
 
 

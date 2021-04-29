@@ -329,6 +329,7 @@ if __name__ == '__main__':
     # Uncomment the line above to use pre-made employees or add it yourself using the system
     initialize_employees()
 
+
     while running:
         show_menu()
 
@@ -400,10 +401,12 @@ if __name__ == '__main__':
             show_all_employees(employees)
             option = int(input(""))
             selected_employee = get_employee_by_id(employees, option).pop()
+            print(f"1: {selected_employee.schedule[0]}")
             print("Escolha a nova agenda de pagamento do funcionário: ")
             show_schedule_types()
             opt = int(input()) - 1
             selected_employee.set_schedule(payment_schedules[opt])
+            print(f"2: {selected_employee.schedule[0]}")
         elif options == 0:
             running = False
             print("Exiting\n")

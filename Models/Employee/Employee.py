@@ -23,7 +23,7 @@ class Employee:
         self._last_pay_date = datetime.now().date()
         self._union_info = UnionMember()
         self._payment_method = payment_method
-        self._schedule = self.set_schedule(schedule_type)
+        self.set_schedule(schedule_type)
 
     def set_schedule(self, schedule_type: str):
         schedule_types = schedule_type.split(" ")
@@ -45,12 +45,12 @@ class Employee:
                 if 0 < day_frequency <= 31:
                     range = pd.date_range(hour, periods=12, freq='MS') \
                             + pd.DateOffset(days=(day_frequency-1))
-                    return range.tolist()
+                    self._schedule = range.tolist()
                 else:
                     print("Selecione um dia do mês válido")
             elif day_frequency == "$":
                 range = pd.date_range(hour, periods=12, freq='BM')
-                return range.tolist()
+                self._schedule = range.tolist()
             else:
                 print("A expressão de agenda de pagamento customizado está inválida, "
                       "tente novamente no formato 'weekly 2 friday', por exemplo")
@@ -60,7 +60,7 @@ class Employee:
             if weekday_frequency:
                 if isinstance(day_frequency, int):
                     range = pd.date_range(hour, periods=12, freq=f'{day_frequency}W-{get_week_day(weekday_frequency)}')
-                    return range.tolist()
+                    self._schedule = range.tolist()
             else:
                 print("A expressão de agenda de pagamento customizado está inválida, "
                       "tente novamente no formato 'weekly 2 friday', por exemplo")

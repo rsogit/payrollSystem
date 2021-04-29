@@ -1,4 +1,19 @@
 # Sistema de folha de pagamento
+
+Rodando o projeto
+-------
+Primeiro, rode os comandos abaixo no terminal:
+
+    $ git clone git@github.com:rsogit/payrollSystem.git
+    $ cd payrollSystem
+
+Instale as dependências:
+
+	$ pip install -r requirements.txt
+
+---
+# Resumo
+
 O objetivo do projeto é construir um sistema de folha de pagamento. O sistema consiste do
 gerenciamento de pagamentos dos empregados de uma empresa. Além disso, o sistema deve
 gerenciar os dados destes empregados, a exemplo os cartões de pontos. Empregados devem receber
